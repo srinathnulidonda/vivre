@@ -1,0 +1,55 @@
+name: vivre
+description: "VIVRE — A more intentional you."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  google_fonts: ^8.0.2
+  shared_preferences: ^2.5.5
+  dio: ^5.7.0
+  flutter_secure_storage: ^9.2.2
+  flutter_dotenv: ^5.2.1
+  shimmer: ^3.0.0
+  google_sign_in: ^6.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.1
+  flutter_native_splash: ^2.4.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app-icon.webp"
+  min_sdk_android: 21
+  adaptive_icon_background: "#F7FAFD"
+  adaptive_icon_foreground: "assets/icons/app_icon_foreground.webp"
+  remove_alpha_ios: true
+
+flutter_native_splash:
+  color: "#F7FAFD"
+  android_12:
+    color: "#F7FAFD"
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - .env
+    - assets/onboarding/
+    - assets/splash/
+    - assets/icons/
+
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter.ttf
