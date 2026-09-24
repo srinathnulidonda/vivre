@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import 'api/auth/auth_api.dart';
 import 'api/config.dart';
+import 'api/notifications/notification_service.dart';
 import 'app/home/home.dart';
 import 'app/navigation.dart';
 import 'app/preferences.dart';
@@ -26,7 +27,17 @@ void main() {
 Future<Widget> _resolveDestination() async {
   await ApiConfig.load();
   ApiClient.instance.init();
-  AuthRepository.instance.initialize(onSessionExpired: navigateToLogin);
+
+  NotificationService.instance.configure(
+    tokenProvider: () => AuthRepository.instance.tokenStorage.getAccessToken(),
+  );
+
+  AuthRepository.instance.initialize(
+    onSessionExpired: () {
+      NotificationService.instance.stop();
+      navigateToLogin();
+    },
+  );
 
   final AuthRepository auth = AuthRepository.instance;
 
@@ -34,6 +45,8 @@ Future<Widget> _resolveDestination() async {
     final bool seen = await AppPreferences.hasSeenOnboarding();
     return seen ? const LoginPage() : const OnboardingFlow();
   }
+
+  NotificationService.instance.start();
 
   final VivreUser? cached = await auth.loadPersistedUser();
   if (cached != null) {

@@ -5,7 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class ApiConfig {
   ApiConfig._();
 
-  static String baseUrl = 'https://vevre.onrender.com';
+  static String baseUrl = 'https://vivre-knva.onrender.com';
   static int timeoutSeconds = 15;
   static bool enableLogging = false;
   static String googleWebClientId = '';

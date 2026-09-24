@@ -8,6 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api_exception.dart';
 import '../config.dart';
+import '../notifications/notification_service.dart';
+import '../work/focus_session_service.dart';
 import 'token_storage.dart';
 
 class TokenResponse {
@@ -88,13 +90,16 @@ class GoogleAuthService {
   GoogleAuthService._internal();
   static final GoogleAuthService instance = GoogleAuthService._internal();
 
+  static const List<String> _scopes = <String>['email', 'profile'];
+
   late final GoogleSignIn _googleSignIn = GoogleSignIn(
     serverClientId: ApiConfig.googleWebClientId,
-    scopes: const <String>['email'],
+    scopes: _scopes,
   );
 
   Future<String?> signInAndGetIdToken() async {
     try {
+      await _googleSignIn.signOut();
       final GoogleSignInAccount? account = await _googleSignIn.signIn();
       if (account == null) return null;
 
@@ -447,7 +452,9 @@ class AuthRepository {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     );
-    return _loadAndCacheCurrentUser();
+    final VivreUser user = await _loadAndCacheCurrentUser();
+    NotificationService.instance.start();
+    return user;
   }
 
   Future<VivreUser> login({
@@ -462,7 +469,9 @@ class AuthRepository {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     );
-    return _loadAndCacheCurrentUser();
+    final VivreUser user = await _loadAndCacheCurrentUser();
+    NotificationService.instance.start();
+    return user;
   }
 
   Future<VivreUser?> signInWithGoogle() async {
@@ -479,10 +488,15 @@ class AuthRepository {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     );
-    return _loadAndCacheCurrentUser();
+    final VivreUser user = await _loadAndCacheCurrentUser();
+    NotificationService.instance.start();
+    return user;
   }
 
   Future<void> logout() async {
+    await NotificationService.instance.stop();
+    await FocusSessionService.instance.stop();
+
     final String? refreshToken = await tokenStorage.getRefreshToken();
     if (refreshToken != null) {
       try {
